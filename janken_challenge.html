@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <script src="js/jquery-2.1.3.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script type="text/javascript" src="js/jquery.jrumble.1.3.js"></script>
+  <link rel="stylesheet" href="css/sample.css">
+  <title>じゃんけん</title>
+
+  <script>
+    //じゃんけん用のSCRIPT
+    //メンバー定義
+    let members = [
+      // asaken: { 'person_image': 'img/01_asaken.png' },
+      // amachan: { 'person_image': 'img/02_amachan.png' },
+      // tsugumin: { 'person_image': 'img/03_tsugumin.jpg' },
+      // ishio: { 'person_image': 'img/04_ishio.png' },
+      // zukka: { 'person_image': 'img/05_zukka.png' },
+      // kantoku: { 'person_image': 'img/06_kantoku.jpg' },
+      // azuazu: { 'person_image': 'img/07_azuazu.jpg' },
+      // terusan: { 'person_image': 'img/08_terusan.png' },
+      // kitadesan: { 'person_image': 'img/09_kitadesan.png' },
+      // bb: { 'person_image': 'img/10_BB.jpg' },
+      // shimazusan: { 'person_image': 'img/11_shimazusan.png' },
+      // shimamotosan: { 'person_image': 'img/12_shimamotosan.png' },
+      // nomesan: { 'person_image': 'img/13_nomesan.jpg' },
+      // suwachan: { 'person_image': 'img/14_suwachan.png' },
+      // kingkazu: { 'person_image': 'img/15_kingKazu.jpg' },
+      // shinmaro: { 'person_image': 'img/16_shinmaro.jpg' },
+      // massu: { 'person_image': 'img/17_massu.png' },
+      // miu: { 'person_image': 'img/18_miu.jpg' },
+      // hide: { 'person_image': 'img/19_hide.png' },
+      // maichiko: { 'person_image': 'img/20_maichiko.png' },
+      // osuzu: { 'person_image': 'img/21_osuzu.png' },
+      // ittetsu: { 'person_image': 'img/22_ittetsu.jpg' },
+      // red: { 'person_image': 'img/23_red.jpg' },
+      // koujiro: { 'person_image': 'img/24_koujiro.png' },
+      // okazaki: { 'person_image': 'img/25_okazaki.jpg' },
+      { 'name': 'amachan', 'person_image': 'img/02_amachan.png' },
+      { 'name': 'tsugumin', 'person_image': 'img/03_tsugumin.jpg' },
+      { 'name': 'ishio', 'person_image': 'img/04_ishio.png' },
+      { 'name': 'zukka', 'person_image': 'img/05_zukka.png' },
+      { 'name': 'kantoku', 'person_image': 'img/06_kantoku.jpg' },
+      { 'name': 'azuazu', 'person_image': 'img/07_azuazu.jpg' },
+      { 'name': 'terusan', 'person_image': 'img/08_terusan.png' },
+      { 'name': 'kitadesan', 'person_image': 'img/09_kitadesan.png' },
+      { 'name': 'bb', 'person_image': 'img/10_BB.jpg' },
+      { 'name': 'shimazusan', 'person_image': 'img/11_shimazusan.png' },
+      { 'name': 'shimamotosan', 'person_image': 'img/12_shimamotosan.png' },
+      { 'name': 'nomesan', 'person_image': 'img/13_nomesan.jpg' },
+      { 'name': 'suwachan', 'person_image': 'img/14_suwachan.png' },
+      { 'name': 'kingkazu', 'person_image': 'img/15_kingKazu.jpg' },
+      { 'name': 'shinmaro', 'person_image': 'img/16_shinmaro.jpg' },
+      { 'name': 'massu', 'person_image': 'img/17_massu.png' },
+      { 'name': 'miu', 'person_image': 'img/18_miu.jpg' },
+      { 'name': 'hide', 'person_image': 'img/19_hide.png' },
+      { 'name': 'maichiko', 'person_image': 'img/20_maichiko.png' },
+      { 'name': 'osuzu', 'person_image': 'img/21_osuzu.png' },
+      { 'name': 'ittetsu', 'person_image': 'img/22_ittetsu.jpg' },
+      { 'name': 'red', 'person_image': 'img/23_red.jpg' },
+      { 'name': 'koujiro', 'person_image': 'img/24_koujiro.png' },
+      { 'name': 'okazaki', 'person_image': 'img/25_okazaki.jpg' },
+    ]
+
+    // let students = persons.filter(person => person.attr === 'student');
+    // let masters = persons.filter(person => person.attr === 'master');
+    // let winners = [];
+    const img_gu = 'img/janken_gu.png';
+    const img_cho = 'img/janken_choki.png';
+    const img_pa = 'img/janken_par.png';
+    const img_hand = ['', img_pa, img_cho, '', img_gu];
+
+    //乱数発生
+    let rnd = (n) => {
+      rnd_n = Math.floor(Math.random() * n);
+    }
+
+    // 登場！--------------------------------------メイン１----------------------
+    let start = () => {
+      // 先にif文で、勝負を続けるかどうかを決める
+      select_members(6); // 登場者を決める（倍率）
+      render_members();  // 登場者を描画する
+      btn_change();      // ボタンを変える
+    }
+
+    // 登場者を決める--------------------------------
+    select_members = (rate) => {
+      members = members.map(member => {         // 初期 member リストから
+        r = Math.floor(Math.random() * rate);
+        return {                                // 選抜リストを作る
+          name: member.name,
+          hand: r,
+          person_image: member.person_image,
+          janken_image: img_hand[r],            // 選抜くじ
+        };
+      })
+      // console.log(`select_members: ${members[0].name}`);
+      // console.log(`select_members: ${members.length}`);
+      members = members.filter(member => member.hand == 0);   // 選抜くじが 0 のものを選抜
+      // console.log(`select_members: ${members.length}`);
+      // console.log(`selected members name: ${members[0].name}`);
+    }
+
+    // 参加者を描く----------------------------------
+    render_members = () => {
+      member_source = '';
+      members.forEach(member => {            // member リストから顔の html を作成
+        member_source += `<li class='${member.name}'><img src='${member.person_image}'></li>`;
+      });
+      $('#participants_field').html(`${member_source}`);    // 吐き出し
+      $('#participants_field').fadeToggle(1000);            // .hide から .show へ 
+      // console.log(`member_source: ${member_source}`);
+    }
+
+    // ボタンを変える---------------------------------
+    btn_change = () => {
+      $('#next_btn').show();                // じゃんけんボタン出現
+      $('#start_btn').hide();               // 登場ボタンを隠す
+    }
+
+    // ゲームスタート！------------------------------メイン２----------------------
+    let game = () => {
+     if (members.length > 1) {              // member が一人なら実行しない
+        set_hands();       // じゃんけんの手を決める
+        render_hands();    // じゃんけんの手を描く
+        set_win_number();  // 判定数を決める
+        set_winners();     // 勝者を決める
+    }
+      closing();         // 勝者が一人なら、クロージングへ
+    }
+
+    // じゃんけんの手を決める---------------------------
+    set_hands = () => {
+      members = members.map(member => {           // じゃんけんの手を決めて,,,
+        r = Math.floor(Math.random() * 3 + 1);
+        if (r == 3) { r = 4 };
+        return {                         // 配列へ書き戻し
+          name: member.name,
+          hand: r,
+          person_image: member.person_image,
+          janken_image: img_hand[r],
+        }
+      })
+    }
+
+    // じゃんけんの手を描く-----------------------------
+    render_hands = () => {
+      hands_source = '';                // 初期化
+      members.forEach(member => {       // HTML整形
+        hands_source += `<li class='${member.name} yura'><img src='${member.janken_image}' class='yura'></li>`;
+      })
+      $('#hands_field').hide();                      // 一度 .hide
+      $('#hands_field').html(`${hands_source}`);     // 吐き出し
+      $('#hands_field').fadeIn(300);                 // 再び .show
+    }
+
+    // 状況を把握する------------------------------------
+    set_win_number = () => {
+      judge_number = 0;                    // 判定数を初期化
+      members.forEach(member => {
+        judge_number = judge_number | member.hand;     // 判定数を作成
+      })
+      win_number = 0;
+      if (judge_number === 3) { win_number = 2 };      // 勝利数を確定
+      if (judge_number === 5) { win_number = 1 };
+      if (judge_number === 6) { win_number = 4 };
+      console.log(`judge_number is ... ${judge_number}`);  // 判定数
+      console.log(`win_number is ... ${win_number}`);      // 勝利数
+    }
+
+    // 勝者を決める--------------------------------------
+    set_winners = () => {
+      if (win_number > 0) {               // win_numberが 0 なら「あいこ」なので何もしない
+        let loosers = members.filter(member => member.hand != win_number);
+        console.log(loosers.length);
+        loosers.forEach(looser => {
+          $(`.${looser.name}`).fadeOut(2000);   // 敗者をクラス名で fadeOut する
+        })
+        members = members.filter(member => member.hand == win_number);   // 勝者のみのリストを作る
+      }
+      if (members.length < 2) {
+        $('#hands_field').hide(2000);
+      }
+    }
+
+    // クロージング--------------------------------------
+    closing = () => {
+      // alert(members.length);
+      // console.log(members.length);
+      // if (members.length < 2) {
+      //   $('#hands_field').hide();
+      // }
+    }
+    
+
+  </script>
+  </header>
+
+<body>
+
+  <main>
+
+    <ul id='btn_field'>
+      <li id="start_btn">参加者入場！！</li>
+      <li id="next_btn">勝負！！ じゃんけん...</li>
+    </ul>
+
+    <ul id="check_field"></ul>
+
+    <ul id="hands_field"></ul>
+
+    <ul id="participants_field">
+    </ul>
+    <div class='yura' style="position: relative; left: 0px; top: 0px; opacity: 1; transform: rotate(0deg);">1</div>
+  </main>
+  <footer></footer>
+
+  <script>
+    $('#start_btn').hide();
+    $('#next_btn').hide();
+    $('#participants_field').hide();
+    $('#start_btn').fadeIn(2000);
+
+    $('#start_btn').on('click', function () {
+      start();
+    });
+
+    $('#next_btn').on('click', function () {
+      game();
+    });
+    // $('#start_btn').jrumble();
+    // $('#start_btn').trigger('startRumble');
+    // $('#hands_field').jrumble();
+    // $('#hands_field').trigger('startRumble');
+    // $('#participants_field').jrumble();
+    // $('#participants_field').trigger('startRumble');
+    $('.yura').jrumble({
+      x: 2,
+      y: 2,
+      rotation: 1
+    });
+    $('.yura').trigger('startRumble');
+    $('.miu').jrumble({
+      x: 2,
+      y: 2,
+      rotation: 1
+    });
+    $('.miu').trigger('startRumble');
+
+      
+  </script>
+
+</body>
+
+</html>
+<div id="demo1" style="position: relative; left: 0px; top: 0px; opacity: 1; transform: rotate(0deg);">1</div>
